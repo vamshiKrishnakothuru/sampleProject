@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="b7b546ce-5675-498a-b5fa-480f3631a01e" >
+		<http:listener-connection host="localhost" port="8086" />
+	</http:listener-config>
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="6926d909-1f95-4026-9ab2-151d1d8e667c" >
+		<salesforce:basic-connection username="bigshots.persistent@gmail.com" password="BS@Persistent01" securityToken="k2Knki10CP7jswgovxMRdoHmZ" />
+	</salesforce:sfdc-config>
+	<flow name="sampleFlow" doc:id="22f3e1be-a46a-4d8a-a994-1c61e9e58cf2" >
+		<http:listener doc:name="Listener" doc:id="0397cca5-f076-483e-9a0e-a47caa481027" config-ref="HTTP_Listener_config" path="/sample" allowedMethods="GET"/>
+		<logger level="INFO" doc:name="Logger" doc:id="fe27490e-6c90-4159-a437-2398db2e7dbf" message="BeforeRead:::::::"/>
+		<salesforce:query doc:id="e061df16-74d7-4286-ba15-ecda023e161d" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query ><![CDATA[SELECT caseId__c, inDate__c, outDate__c, status__c, Id, Name FROM Patient__c ]]></salesforce:salesforce-query>
+		</salesforce:query>
+		<logger level="INFO" doc:name="Logger" doc:id="1b966581-bc94-4e5f-8945-2c867ade5415" message="after logger:::::::;#[payload]" />
+		<ee:transform doc:name="Transform Message" doc:id="6173928e-29d4-4778-9152-5ca0a148ca48" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
